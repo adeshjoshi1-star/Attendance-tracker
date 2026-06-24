@@ -39,15 +39,17 @@ export default function LeaveBalances() {
     return () => clearTimeout(timer);
   }, [fetchEmployees]);
 
+  const getClAllocated = (emp) => emp.casual_allocated ?? emp.leave_balances?.casual?.allocated ?? emp.leaveBalances?.casual?.allocated ?? 0;
+  const getClUsed = (emp) => emp.casual_used ?? emp.leave_balances?.casual?.used ?? emp.leaveBalances?.casual?.used ?? 0;
+  const getSlAllocated = (emp) => emp.sick_allocated ?? emp.leave_balances?.sick?.allocated ?? emp.leaveBalances?.sick?.allocated ?? 0;
+  const getSlUsed = (emp) => emp.sick_used ?? emp.leave_balances?.sick?.used ?? emp.leaveBalances?.sick?.used ?? 0;
+
   const summary = employees.reduce(
     (acc, emp) => {
-      const balances = emp.leave_balances || emp.leaveBalances || {};
-      const cl = balances.casual || balances.CL || {};
-      const sl = balances.sick || balances.SL || {};
-      acc.totalCLAllocated += cl.allocated || cl.alloted || 0;
-      acc.totalCLUsed += cl.used || 0;
-      acc.totalSLAllocated += sl.allocated || sl.alloted || 0;
-      acc.totalSLUsed += sl.used || 0;
+      acc.totalCLAllocated += getClAllocated(emp);
+      acc.totalCLUsed += getClUsed(emp);
+      acc.totalSLAllocated += getSlAllocated(emp);
+      acc.totalSLUsed += getSlUsed(emp);
       return acc;
     },
     { totalCLAllocated: 0, totalCLUsed: 0, totalSLAllocated: 0, totalSLUsed: 0 }
@@ -90,12 +92,6 @@ export default function LeaveBalances() {
     setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
   };
 
-  const getBalance = (emp, type, field) => {
-    const balances = emp.leave_balances || emp.leaveBalances || {};
-    const lb = type === 'cl' ? (balances.casual || balances.CL || {}) : (balances.sick || balances.SL || {});
-    return lb[field] ?? 0;
-  };
-
   const columns = [
     { key: 'employee_id', label: 'Employee ID' },
     { key: 'name', label: 'Name' },
@@ -103,40 +99,32 @@ export default function LeaveBalances() {
     {
       key: 'cl_allocated',
       label: 'CL Allocated',
-      render: (_, row) => getBalance(row, 'cl', 'allocated') || getBalance(row, 'cl', 'alloted'),
+      render: (_, row) => getClAllocated(row),
     },
     {
       key: 'cl_used',
       label: 'CL Used',
-      render: (_, row) => getBalance(row, 'cl', 'used'),
+      render: (_, row) => getClUsed(row),
     },
     {
       key: 'cl_remaining',
       label: 'CL Remaining',
-      render: (_, row) => {
-        const allocated = getBalance(row, 'cl', 'allocated') || getBalance(row, 'cl', 'alloted');
-        const used = getBalance(row, 'cl', 'used');
-        return allocated - used;
-      },
+      render: (_, row) => getClAllocated(row) - getClUsed(row),
     },
     {
       key: 'sl_allocated',
       label: 'SL Allocated',
-      render: (_, row) => getBalance(row, 'sl', 'allocated') || getBalance(row, 'sl', 'alloted'),
+      render: (_, row) => getSlAllocated(row),
     },
     {
       key: 'sl_used',
       label: 'SL Used',
-      render: (_, row) => getBalance(row, 'sl', 'used'),
+      render: (_, row) => getSlUsed(row),
     },
     {
       key: 'sl_remaining',
       label: 'SL Remaining',
-      render: (_, row) => {
-        const allocated = getBalance(row, 'sl', 'allocated') || getBalance(row, 'sl', 'alloted');
-        const used = getBalance(row, 'sl', 'used');
-        return allocated - used;
-      },
+      render: (_, row) => getSlAllocated(row) - getSlUsed(row),
     },
     {
       key: 'actions',
