@@ -126,4 +126,49 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-module.exports = { login, getProfile, changePassword };
+const employeeLogin = async (req, res, next) => {
+  try {
+    const { employee_code } = req.body;
+
+    if (!employee_code) {
+      return res.status(400).json({ success: false, message: 'Employee code is required' });
+    }
+
+    const [users] = await pool.query(
+      'SELECT id, employee_id, name, email, password_hash, role, department, status FROM users WHERE employee_id = ?',
+      [employee_code]
+    );
+
+    if (users.length === 0) {
+      return res.status(401).json({ success: false, message: 'Invalid employee code' });
+    }
+
+    const user = users[0];
+
+    if (user.status !== 'active') {
+      return res.status(403).json({ success: false, message: 'Account is deactivated. Contact admin.' });
+    }
+
+    const tokenPayload = {
+      id: user.id,
+      employee_id: user.employee_id,
+      name: user.name,
+      email: user.email,
+      role: 'employee',
+      department: user.department,
+      status: user.status,
+    };
+
+    const token = jwt.sign(tokenPayload, config.jwt.secret, { expiresIn: config.jwt.expiresIn });
+
+    res.json({
+      success: true,
+      token,
+      user: tokenPayload,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports = { login, getProfile, changePassword, employeeLogin };

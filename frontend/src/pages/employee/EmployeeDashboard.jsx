@@ -82,11 +82,14 @@ export default function EmployeeDashboard() {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Welcome back, {user?.name || 'Employee'}
+          Welcome, Employee
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           {format(new Date(), 'EEEE, MMMM do, yyyy')}
         </p>
+        <div className="mt-2 inline-flex items-center px-3 py-1 text-xs font-medium bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full">
+          Employee Code: {user?.employee_id || 'N/A'}
+        </div>
       </div>
 
       {todayStatus && todayStatus.status ? (

@@ -10,13 +10,11 @@ import {
 } from '../../services/employeeService';
 
 const departments = [
-  { value: 'Engineering', label: 'Engineering' },
-  { value: 'Design', label: 'Design' },
-  { value: 'Marketing', label: 'Marketing' },
   { value: 'Sales', label: 'Sales' },
-  { value: 'HR', label: 'HR' },
-  { value: 'Finance', label: 'Finance' },
   { value: 'Operations', label: 'Operations' },
+  { value: 'Quality', label: 'Quality' },
+  { value: 'Finance', label: 'Finance' },
+  { value: 'Other', label: 'Other' },
 ];
 
 const roles = [
@@ -38,6 +36,8 @@ export default function EmployeeForm() {
     department: '',
     role: 'employee',
     status: 'active',
+    casualLeaveAllocation: 12,
+    sickLeaveAllocation: 10,
   });
   const [errors, setErrors] = useState({});
 
@@ -96,7 +96,8 @@ export default function EmployeeForm() {
     setSubmitting(true);
     try {
       if (isEdit) {
-        await updateEmployee(id, formData);
+        const { casualLeaveAllocation, sickLeaveAllocation, ...updateData } = formData;
+        await updateEmployee(id, updateData);
         toast.success('Employee updated successfully');
       } else {
         await createEmployee(formData);
@@ -181,6 +182,27 @@ export default function EmployeeForm() {
           required
           options={roles}
         />
+
+        {!isEdit && (
+          <div className="grid grid-cols-2 gap-4">
+            <FormInput
+              label="Casual Leave Allocation"
+              name="casualLeaveAllocation"
+              type="number"
+              value={formData.casualLeaveAllocation}
+              onChange={handleChange}
+              min="0"
+            />
+            <FormInput
+              label="Sick Leave Allocation"
+              name="sickLeaveAllocation"
+              type="number"
+              value={formData.sickLeaveAllocation}
+              onChange={handleChange}
+              min="0"
+            />
+          </div>
+        )}
 
         {isEdit && (
           <FormInput

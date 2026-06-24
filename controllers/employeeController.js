@@ -40,10 +40,12 @@ const getEmployees = async (req, res, next) => {
     const total = countResult[0].total;
 
     const [rows] = await pool.query(
-      `SELECT u.id, u.employee_id, u.name, u.email, u.phone, u.department, u.role, u.status, u.created_at
-       FROM users u ${whereStr}
-       ORDER BY u.created_at DESC
-       LIMIT ? OFFSET ?`,
+`SELECT u.id, u.employee_id, u.name, u.email, u.phone, u.department, u.role, u.status, u.created_at,
+               lb.casual_allocated, lb.casual_used, lb.sick_allocated, lb.sick_used
+        FROM users u
+        LEFT JOIN leave_balances lb ON u.id = lb.employee_id ${whereStr}
+        ORDER BY u.created_at DESC
+        LIMIT ? OFFSET ?`,
       [...params, limit, offset]
     );
 
@@ -104,7 +106,7 @@ const getEmployee = async (req, res, next) => {
 const createEmployee = async (req, res, next) => {
   const connection = await pool.getConnection();
   try {
-    const { name, email, phone, department, role } = req.body;
+    const { name, email, phone, department, role, casual_allocated, sick_allocated } = req.body;
 
     if (!name || !name.trim()) {
       connection.release();
@@ -136,8 +138,8 @@ const createEmployee = async (req, res, next) => {
 
     await connection.query(
       `INSERT INTO leave_balances (employee_id, casual_allocated, casual_used, sick_allocated, sick_used)
-       VALUES (?, 12, 0, 12, 0)`,
-      [userId]
+       VALUES (?, ?, 0, ?, 0)`,
+      [userId, casual_allocated || 12, sick_allocated || 10]
     );
 
     await connection.commit();

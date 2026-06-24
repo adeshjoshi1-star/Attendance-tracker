@@ -15,6 +15,8 @@ const departments = [
   { value: '', label: 'All' },
   { value: 'Sales', label: 'Sales' },
   { value: 'Operations', label: 'Operations' },
+  { value: 'Quality', label: 'Quality' },
+  { value: 'Finance', label: 'Finance' },
   { value: 'Other', label: 'Other' },
 ];
 

@@ -24,8 +24,8 @@ async function seed() {
       { empId: 'EMP0001', name: 'John Doe', email: 'john.doe@company.com', phone: '9876543210', dept: 'Sales' },
       { empId: 'EMP0002', name: 'Jane Smith', email: 'jane.smith@company.com', phone: '9876543211', dept: 'Sales' },
       { empId: 'EMP0003', name: 'Bob Wilson', email: 'bob.wilson@company.com', phone: '9876543212', dept: 'Operations' },
-      { empId: 'EMP0004', name: 'Alice Brown', email: 'alice.brown@company.com', phone: '9876543213', dept: 'Operations' },
-      { empId: 'EMP0005', name: 'Charlie Davis', email: 'charlie.davis@company.com', phone: '9876543214', dept: 'Other' },
+      { empId: 'EMP0004', name: 'Alice Brown', email: 'alice.brown@company.com', phone: '9876543213', dept: 'Quality' },
+      { empId: 'EMP0005', name: 'Charlie Davis', email: 'charlie.davis@company.com', phone: '9876543214', dept: 'Finance' },
     ];
 
     const employeeIds = [];

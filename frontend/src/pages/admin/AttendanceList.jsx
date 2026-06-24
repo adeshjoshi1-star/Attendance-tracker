@@ -101,13 +101,11 @@ export default function AttendanceList() {
       label: 'Department',
       type: 'select',
       options: [
-        { value: 'Engineering', label: 'Engineering' },
-        { value: 'Design', label: 'Design' },
-        { value: 'Marketing', label: 'Marketing' },
         { value: 'Sales', label: 'Sales' },
-        { value: 'HR', label: 'HR' },
-        { value: 'Finance', label: 'Finance' },
         { value: 'Operations', label: 'Operations' },
+        { value: 'Quality', label: 'Quality' },
+        { value: 'Finance', label: 'Finance' },
+        { value: 'Other', label: 'Other' },
       ],
     },
     {

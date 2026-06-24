@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) UNIQUE NOT NULL,
   phone VARCHAR(20),
-  department ENUM('Sales', 'Operations', 'Other') DEFAULT 'Other',
+  department ENUM('Sales', 'Operations', 'Quality', 'Finance', 'Other') DEFAULT 'Other',
   role ENUM('admin', 'employee') DEFAULT 'employee',
   password_hash VARCHAR(255) NOT NULL,
   status ENUM('active', 'inactive') DEFAULT 'active',

@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login as loginApi, getProfile } from '../services/authService';
+import { login as loginApi, getProfile, employeeLogin as employeeLoginApi } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -37,6 +37,12 @@ export function AuthProvider({ children }) {
     return userData;
   }, []);
 
+  const employeeLogin = useCallback(async (employeeCode) => {
+    const userData = await employeeLoginApi(employeeCode);
+    setUser(userData);
+    return userData;
+  }, []);
+
   const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
@@ -47,7 +53,7 @@ export function AuthProvider({ children }) {
   const isAdmin = user?.role === 'admin';
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout, isAdmin }}>
+    <AuthContext.Provider value={{ user, loading, login, employeeLogin, logout, isAdmin }}>
       {children}
     </AuthContext.Provider>
   );
