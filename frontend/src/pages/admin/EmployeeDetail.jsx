@@ -31,7 +31,7 @@ export default function EmployeeDetail() {
   const [confirmDialog, setConfirmDialog] = useState(null);
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [adjustForm, setAdjustForm] = useState({
-    leave_type: 'CL',
+    leave_type: 'Casual Leave',
     days: 1,
     type: 'add',
     reason: '',
@@ -103,7 +103,7 @@ export default function EmployeeDetail() {
       await adjustLeaveBalance({
         employee_id: id,
         leave_type: adjustForm.leave_type,
-        days: adjustForm.type === 'deduct' ? -Math.abs(adjustForm.days) : Math.abs(adjustForm.days),
+        adjustment_days: adjustForm.type === 'deduct' ? -Math.abs(adjustForm.days) : Math.abs(adjustForm.days),
         reason: adjustForm.reason,
       });
       toast.success('Leave balance adjusted');
@@ -349,8 +349,8 @@ export default function EmployeeDetail() {
               onChange={(e) => setAdjustForm((prev) => ({ ...prev, leave_type: e.target.value }))}
               className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             >
-              <option value="CL">CL (Casual Leave)</option>
-              <option value="SL">SL (Sick Leave)</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Sick Leave">Sick Leave</option>
             </select>
           </div>
 

@@ -13,7 +13,7 @@ export default function LeaveBalances() {
   const [search, setSearch] = useState('');
   const [adjustModal, setAdjustModal] = useState(null);
   const [formData, setFormData] = useState({
-    leave_type: 'casual',
+    leave_type: 'Casual Leave',
     adjustment_type: 'add',
     days: '',
     reason: '',
@@ -76,7 +76,7 @@ export default function LeaveBalances() {
       });
       toast.success('Leave balance adjusted successfully');
       setAdjustModal(null);
-      setFormData({ leave_type: 'casual', adjustment_type: 'add', days: '', reason: '' });
+      setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
       fetchEmployees();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to adjust balance');
@@ -87,7 +87,7 @@ export default function LeaveBalances() {
 
   const openAdjustModal = (emp) => {
     setAdjustModal(emp);
-    setFormData({ leave_type: 'casual', adjustment_type: 'add', days: '', reason: '' });
+    setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
   };
 
   const getBalance = (emp, type, field) => {
@@ -211,8 +211,8 @@ export default function LeaveBalances() {
               onChange={(e) => setFormData((prev) => ({ ...prev, leave_type: e.target.value }))}
               className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             >
-              <option value="casual">Casual Leave</option>
-              <option value="sick">Sick Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Sick Leave">Sick Leave</option>
             </select>
           </div>
 
@@ -291,7 +291,7 @@ export default function LeaveBalances() {
             <button
               onClick={() => {
                 setAdjustModal(null);
-                setFormData({ leave_type: 'casual', adjustment_type: 'add', days: '', reason: '' });
+                setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
               }}
               className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 rounded-lg transition-colors"
             >
