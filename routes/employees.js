@@ -12,8 +12,8 @@ router.get('/', getEmployees);
 router.get('/:id', getEmployee);
 router.post('/', createEmployee);
 router.put('/:id', updateEmployee);
-router.put('/:id/deactivate', deactivateEmployee);
-router.put('/:id/activate', activateEmployee);
-router.put('/:id/reset-password', resetPassword);
+router.patch('/:id/deactivate', deactivateEmployee);
+router.patch('/:id/activate', activateEmployee);
+router.post('/:id/reset-password', resetPassword);
 
 module.exports = router;

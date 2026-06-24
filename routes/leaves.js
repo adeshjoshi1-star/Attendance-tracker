@@ -11,8 +11,8 @@ router.get('/my', auth, getMyLeaves);
 router.get('/my-balance', auth, getMyLeaveBalance);
 router.get('/pending', adminAuth, getPendingLeaves);
 router.get('/', adminAuth, getAllLeaves);
-router.put('/:id/approve', adminAuth, approveLeave);
-router.put('/:id/reject', adminAuth, rejectLeave);
+router.patch('/:id/approve', adminAuth, approveLeave);
+router.patch('/:id/reject', adminAuth, rejectLeave);
 router.post('/adjust-balance', adminAuth, adjustLeaveBalance);
 router.get('/adjustment-logs', adminAuth, getLeaveAdjustmentLogs);
 

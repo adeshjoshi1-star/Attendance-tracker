@@ -81,6 +81,7 @@ function AppRoutes() {
         <Route path="dashboard" element={<AdminDashboard />} />
         <Route path="employees" element={<EmployeeList />} />
         <Route path="employees/new" element={<EmployeeForm />} />
+        <Route path="employees/:id/edit" element={<EmployeeForm />} />
         <Route path="employees/:id" element={<EmployeeDetail />} />
         <Route path="attendance" element={<AttendanceList />} />
         <Route path="leaves" element={<LeaveManagement />} />

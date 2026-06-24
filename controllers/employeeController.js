@@ -158,8 +158,9 @@ const createEmployee = async (req, res, next) => {
 };
 
 const updateEmployee = async (req, res, next) => {
+  const connection = await pool.getConnection();
   try {
-    const { name, email, phone, department, status } = req.body;
+    const { name, email, phone, department, status, casual_allocated, sick_allocated } = req.body;
     const { id } = req.params;
 
     const fields = [];
@@ -171,23 +172,54 @@ const updateEmployee = async (req, res, next) => {
     if (department !== undefined) { fields.push('department = ?'); params.push(department); }
     if (status !== undefined) { fields.push('status = ?'); params.push(status); }
 
-    if (fields.length === 0) {
+    if (fields.length === 0 && casual_allocated === undefined && sick_allocated === undefined) {
+      connection.release();
       return res.status(400).json({ success: false, message: 'No fields to update' });
     }
 
-    params.push(id);
+    await connection.beginTransaction();
 
-    const [result] = await pool.query(
-      `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
-      params
-    );
+    if (fields.length > 0) {
+      params.push(id);
+      const [result] = await connection.query(
+        `UPDATE users SET ${fields.join(', ')} WHERE id = ?`,
+        params
+      );
 
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Employee not found' });
+      if (result.affectedRows === 0) {
+        await connection.rollback();
+        connection.release();
+        return res.status(404).json({ success: false, message: 'Employee not found' });
+      }
     }
+
+    if (casual_allocated !== undefined || sick_allocated !== undefined) {
+      const balFields = [];
+      const balParams = [];
+      if (casual_allocated !== undefined) { balFields.push('casual_allocated = ?'); balParams.push(casual_allocated); }
+      if (sick_allocated !== undefined) { balFields.push('sick_allocated = ?'); balParams.push(sick_allocated); }
+      const balSets = balFields.join(', ');
+      balParams.push(id);
+      const [existing] = await connection.query('SELECT id FROM leave_balances WHERE employee_id = ?', [id]);
+      if (existing.length === 0) {
+        await connection.query(
+          'INSERT INTO leave_balances (employee_id) VALUES (?)',
+          [id]
+        );
+      }
+      await connection.query(
+        `UPDATE leave_balances SET ${balSets} WHERE employee_id = ?`,
+        balParams
+      );
+    }
+
+    await connection.commit();
+    connection.release();
 
     res.json({ success: true, message: 'Employee updated successfully' });
   } catch (error) {
+    await connection.rollback().catch(() => {});
+    connection.release();
     next(error);
   }
 };

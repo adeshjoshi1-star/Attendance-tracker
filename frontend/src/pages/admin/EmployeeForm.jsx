@@ -58,6 +58,8 @@ export default function EmployeeForm() {
         department: emp.department || '',
         role: emp.role || 'employee',
         status: emp.status || 'active',
+        casualLeaveAllocation: emp.casual_allocated ?? emp.leave_balance?.casual?.allocated ?? 12,
+        sickLeaveAllocation: emp.sick_allocated ?? emp.leave_balance?.sick?.allocated ?? 10,
       });
     } catch (err) {
       toast.error('Failed to load employee');
@@ -97,7 +99,7 @@ export default function EmployeeForm() {
     try {
       if (isEdit) {
         const { casualLeaveAllocation, sickLeaveAllocation, ...updateData } = formData;
-        await updateEmployee(id, updateData);
+        await updateEmployee(id, { ...updateData, casual_allocated: casualLeaveAllocation, sick_allocated: sickLeaveAllocation });
         toast.success('Employee updated successfully');
       } else {
         const { casualLeaveAllocation, sickLeaveAllocation, ...rest } = formData;
@@ -184,26 +186,24 @@ export default function EmployeeForm() {
           options={roles}
         />
 
-        {!isEdit && (
-          <div className="grid grid-cols-2 gap-4">
-            <FormInput
-              label="Casual Leave Allocation"
-              name="casualLeaveAllocation"
-              type="number"
-              value={formData.casualLeaveAllocation}
-              onChange={handleChange}
-              min="0"
-            />
-            <FormInput
-              label="Sick Leave Allocation"
-              name="sickLeaveAllocation"
-              type="number"
-              value={formData.sickLeaveAllocation}
-              onChange={handleChange}
-              min="0"
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-2 gap-4">
+          <FormInput
+            label="Casual Leave Allocation"
+            name="casualLeaveAllocation"
+            type="number"
+            value={formData.casualLeaveAllocation}
+            onChange={handleChange}
+            min="0"
+          />
+          <FormInput
+            label="Sick Leave Allocation"
+            name="sickLeaveAllocation"
+            type="number"
+            value={formData.sickLeaveAllocation}
+            onChange={handleChange}
+            min="0"
+          />
+        </div>
 
         {isEdit && (
           <FormInput

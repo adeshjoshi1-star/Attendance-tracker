@@ -14,6 +14,7 @@ export default function LeaveBalances() {
   const [adjustModal, setAdjustModal] = useState(null);
   const [formData, setFormData] = useState({
     leave_type: 'Casual Leave',
+    target: 'allocated',
     adjustment_type: 'add',
     days: '',
     reason: '',
@@ -75,10 +76,11 @@ export default function LeaveBalances() {
         leave_type: formData.leave_type,
         adjustment_days: days,
         reason: formData.reason,
+        target: formData.target,
       });
       toast.success('Leave balance adjusted successfully');
       setAdjustModal(null);
-      setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
+      setFormData({ leave_type: 'Casual Leave', target: 'allocated', adjustment_type: 'add', days: '', reason: '' });
       fetchEmployees();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to adjust balance');
@@ -89,7 +91,7 @@ export default function LeaveBalances() {
 
   const openAdjustModal = (emp) => {
     setAdjustModal(emp);
-    setFormData({ leave_type: 'Casual Leave', adjustment_type: 'add', days: '', reason: '' });
+    setFormData({ leave_type: 'Casual Leave', target: 'allocated', adjustment_type: 'add', days: '', reason: '' });
   };
 
   const columns = [
@@ -202,6 +204,36 @@ export default function LeaveBalances() {
               <option value="Casual Leave">Casual Leave</option>
               <option value="Sick Leave">Sick Leave</option>
             </select>
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+              Target <span className="text-red-500">*</span>
+            </label>
+            <div className="flex gap-4">
+              <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                <input
+                  type="radio"
+                  name="target"
+                  value="allocated"
+                  checked={formData.target === 'allocated'}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, target: e.target.value }))}
+                  className="text-primary-600 focus:ring-primary-500"
+                />
+                Yearly Allocation
+              </label>
+              <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer">
+                <input
+                  type="radio"
+                  name="target"
+                  value="used"
+                  checked={formData.target === 'used'}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, target: e.target.value }))}
+                  className="text-primary-600 focus:ring-primary-500"
+                />
+                Used Credits
+              </label>
+            </div>
           </div>
 
           <div className="space-y-1.5">

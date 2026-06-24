@@ -116,7 +116,7 @@ export default function EmployeeList() {
             View
           </Link>
           <Link
-            to={`/admin/employees/${row.id || row._id}`}
+            to={`/admin/employees/${row.id || row._id}/edit`}
             className="px-2 py-1 text-xs font-medium text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-700 rounded-md hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
           >
             Edit
