@@ -289,7 +289,7 @@ const rejectLeave = async (req, res, next) => {
 const adjustLeaveBalance = async (req, res, next) => {
   const connection = await pool.getConnection();
   try {
-    const { employee_id, leave_type, adjustment_days, reason, target } = req.body;
+    const { employee_id, leave_type, adjustment_days, reason } = req.body;
 
     if (!employee_id || !leave_type || adjustment_days === undefined || !reason) {
       connection.release();
@@ -315,31 +315,25 @@ const adjustLeaveBalance = async (req, res, next) => {
 
     await connection.beginTransaction();
 
+    const [existing] = await connection.query('SELECT id FROM leave_balances WHERE employee_id = ?', [employee_id]);
+    if (existing.length === 0) {
+      await connection.query(
+        'INSERT INTO leave_balances (employee_id) VALUES (?)',
+        [employee_id]
+      );
+    }
+
     const col = leave_type === 'Casual Leave' ? 'casual' : 'sick';
-    if (target === 'allocated') {
-      if (adj > 0) {
-        await connection.query(
-          `UPDATE leave_balances SET ${col}_allocated = ${col}_allocated + ? WHERE employee_id = ?`,
-          [adj, employee_id]
-        );
-      } else {
-        await connection.query(
-          `UPDATE leave_balances SET ${col}_allocated = GREATEST(${col}_allocated - ?, 0) WHERE employee_id = ?`,
-          [Math.abs(adj), employee_id]
-        );
-      }
+    if (adj > 0) {
+      await connection.query(
+        `UPDATE leave_balances SET ${col}_allocated = ${col}_allocated + ? WHERE employee_id = ?`,
+        [adj, employee_id]
+      );
     } else {
-      if (adj > 0) {
-        await connection.query(
-          `UPDATE leave_balances SET ${col}_used = GREATEST(${col}_used - ?, 0) WHERE employee_id = ?`,
-          [adj, employee_id]
-        );
-      } else {
-        await connection.query(
-          `UPDATE leave_balances SET ${col}_used = ${col}_used + ? WHERE employee_id = ?`,
-          [Math.abs(adj), employee_id]
-        );
-      }
+      await connection.query(
+        `UPDATE leave_balances SET ${col}_allocated = GREATEST(${col}_allocated - ?, 0) WHERE employee_id = ?`,
+        [Math.abs(adj), employee_id]
+      );
     }
 
     await connection.query(

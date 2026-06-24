@@ -32,7 +32,6 @@ export default function EmployeeDetail() {
   const [showAdjustModal, setShowAdjustModal] = useState(false);
   const [adjustForm, setAdjustForm] = useState({
     leave_type: 'Casual Leave',
-    target: 'used',
     days: 1,
     type: 'add',
     reason: '',
@@ -106,11 +105,10 @@ export default function EmployeeDetail() {
         leave_type: adjustForm.leave_type,
         adjustment_days: adjustForm.type === 'deduct' ? -Math.abs(adjustForm.days) : Math.abs(adjustForm.days),
         reason: adjustForm.reason,
-        target: adjustForm.target,
       });
       toast.success('Leave balance adjusted');
       setShowAdjustModal(false);
-      setAdjustForm({ leave_type: 'Casual Leave', target: 'used', days: 1, type: 'add', reason: '' });
+      setAdjustForm({ leave_type: 'Casual Leave', days: 1, type: 'add', reason: '' });
       loadData();
     } catch (err) {
       toast.error(err.response?.data?.message || 'Failed to adjust balance');
@@ -353,18 +351,6 @@ export default function EmployeeDetail() {
             >
               <option value="Casual Leave">Casual Leave</option>
               <option value="Sick Leave">Sick Leave</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Target</label>
-            <select
-              value={adjustForm.target}
-              onChange={(e) => setAdjustForm((prev) => ({ ...prev, target: e.target.value }))}
-              className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
-            >
-              <option value="used">Used Credits</option>
-              <option value="allocated">Yearly Allocation</option>
             </select>
           </div>
 
