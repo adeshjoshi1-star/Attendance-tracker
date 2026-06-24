@@ -100,7 +100,8 @@ export default function EmployeeForm() {
         await updateEmployee(id, updateData);
         toast.success('Employee updated successfully');
       } else {
-        await createEmployee(formData);
+        const { casualLeaveAllocation, sickLeaveAllocation, ...rest } = formData;
+        await createEmployee({ ...rest, casual_allocated: casualLeaveAllocation, sick_allocated: sickLeaveAllocation });
         toast.success('Employee created successfully');
       }
       navigate('/admin/employees');
