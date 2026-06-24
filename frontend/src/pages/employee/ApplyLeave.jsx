@@ -117,12 +117,12 @@ export default function ApplyLeave() {
 
   const daysCount = calculateDays();
 
-  const casualLeave = leaveBalance?.casual_leave ?? leaveBalance?.casualLeave ?? { allocated: 0, remaining: 0 };
-  const sickLeave = leaveBalance?.sick_leave ?? leaveBalance?.sickLeave ?? { allocated: 0, remaining: 0 };
+  const casualLeave = leaveBalance?.casual ?? { allocated: 0, remaining: 0 };
+  const sickLeave = leaveBalance?.sick ?? { allocated: 0, remaining: 0 };
 
   const insufficientBalance =
-    form.leave_type === 'casual_leave' && daysCount > (casualLeave.remaining ?? 0) ||
-    form.leave_type === 'sick_leave' && daysCount > (sickLeave.remaining ?? 0);
+    form.leave_type === 'Casual Leave' && daysCount > (casualLeave.remaining ?? 0) ||
+    form.leave_type === 'Sick Leave' && daysCount > (sickLeave.remaining ?? 0);
 
   if (loading) {
     return (
@@ -187,8 +187,8 @@ export default function ApplyLeave() {
             }`}
           >
             <option value="">Select leave type</option>
-            <option value="casual_leave">Casual Leave</option>
-            <option value="sick_leave">Sick Leave</option>
+            <option value="Casual Leave">Casual Leave</option>
+            <option value="Sick Leave">Sick Leave</option>
           </select>
           {errors.leave_type && (
             <p className="mt-1 text-xs text-red-500">{errors.leave_type}</p>
@@ -278,7 +278,7 @@ export default function ApplyLeave() {
       {showConfirm && (
         <ConfirmDialog
           title="Confirm Leave Request"
-          message={`You are applying for ${daysCount} day(s) of ${form.leave_type === 'casual_leave' ? 'Casual Leave' : 'Sick Leave'} from ${form.start_date} to ${form.end_date}.`}
+          message={`You are applying for ${daysCount} day(s) of ${form.leave_type} from ${form.start_date} to ${form.end_date}.`}
           confirmText="Submit"
           onConfirm={confirmSubmit}
           onCancel={() => setShowConfirm(false)}

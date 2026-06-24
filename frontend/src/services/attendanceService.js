@@ -1,7 +1,7 @@
 import api from './api';
 
-export const markAttendance = async (status, remarks) => {
-  const response = await api.post('/attendance/mark', { status, remarks });
+export const markAttendance = async (status, remarks, date) => {
+  const response = await api.post('/attendance/mark', { attendance_status: status, remarks, attendance_date: date });
   return response.data;
 };
 

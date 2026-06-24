@@ -8,13 +8,17 @@ import ConfirmDialog from '../../components/ui/ConfirmDialog';
 import { getTodayStatus, markAttendance } from '../../services/attendanceService';
 
 const STATUS_OPTIONS = [
-  { value: 'present', label: 'Present', color: 'bg-green-500 hover:bg-green-600', icon: '✅' },
-  { value: 'work_from_home', label: 'Work From Home', color: 'bg-blue-500 hover:bg-blue-600', icon: '🏠' },
-  { value: 'half_day', label: 'Half Day', color: 'bg-yellow-500 hover:bg-yellow-600', icon: '🌗' },
-  { value: 'casual_leave', label: 'Casual Leave', color: 'bg-orange-500 hover:bg-orange-600', icon: '🏖️' },
-  { value: 'sick_leave', label: 'Sick Leave', color: 'bg-red-500 hover:bg-red-600', icon: '🏥' },
-  { value: 'absent', label: 'Absent', color: 'bg-slate-500 hover:bg-slate-600', icon: '❌' },
+  { value: 'Present', label: 'Present', color: 'bg-green-500 hover:bg-green-600', icon: '✅' },
+  { value: 'Work From Home', label: 'Work From Home', color: 'bg-blue-500 hover:bg-blue-600', icon: '🏠' },
+  { value: 'Half Day', label: 'Half Day', color: 'bg-yellow-500 hover:bg-yellow-600', icon: '🌗' },
+  { value: 'Casual Leave', label: 'Casual Leave', color: 'bg-orange-500 hover:bg-orange-600', icon: '🏖️' },
+  { value: 'Sick Leave', label: 'Sick Leave', color: 'bg-red-500 hover:bg-red-600', icon: '🏥' },
+  { value: 'Absent', label: 'Absent', color: 'bg-slate-500 hover:bg-slate-600', icon: '❌' },
 ];
+
+function formatToday() {
+  return new Date().toISOString().split('T')[0];
+}
 
 export default function MarkAttendance() {
   const navigate = useNavigate();
@@ -22,6 +26,7 @@ export default function MarkAttendance() {
   const [todayStatus, setTodayStatus] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState('');
+  const [attendanceDate, setAttendanceDate] = useState(formatToday());
   const [remarks, setRemarks] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -59,7 +64,7 @@ export default function MarkAttendance() {
     setSubmitting(true);
     setShowConfirm(false);
     try {
-      await markAttendance(selectedStatus, remarks);
+      await markAttendance(selectedStatus, remarks, attendanceDate);
       toast.success(todayStatus?.status ? 'Attendance updated successfully!' : 'Attendance marked successfully!');
       setTimeout(() => navigate('/employee/dashboard'), 2000);
     } catch (err) {
@@ -151,6 +156,20 @@ export default function MarkAttendance() {
 
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+              Date
+            </label>
+            <input
+              type="date"
+              value={attendanceDate}
+              onChange={(e) => setAttendanceDate(e.target.value)}
+              max={formatToday()}
+              disabled={submitting}
+              className="w-full px-3 py-2 text-sm border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors disabled:opacity-50"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
               Remarks <span className="text-slate-400">(optional)</span>
             </label>
             <textarea
@@ -182,7 +201,7 @@ export default function MarkAttendance() {
       {showConfirm && (
         <ConfirmDialog
           title={isAlreadyMarked ? 'Update Attendance' : 'Confirm Attendance'}
-          message={`Are you sure you want to mark yourself as "${STATUS_OPTIONS.find((o) => o.value === selectedStatus)?.label}"?`}
+          message={`Are you sure you want to mark ${attendanceDate} as "${STATUS_OPTIONS.find((o) => o.value === selectedStatus)?.label}"?`}
           confirmText={isAlreadyMarked ? 'Update' : 'Confirm'}
           onConfirm={confirmSubmit}
           onCancel={() => setShowConfirm(false)}

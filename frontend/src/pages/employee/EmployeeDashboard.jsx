@@ -75,8 +75,8 @@ export default function EmployeeDashboard() {
   }
 
   const attendancePercent = monthlyStats?.attendance_percentage ?? monthlyStats?.percentage ?? 0;
-  const casualLeave = leaveBalance?.casual_leave ?? leaveBalance?.casualLeave ?? { allocated: 0, remaining: 0 };
-  const sickLeave = leaveBalance?.sick_leave ?? leaveBalance?.sickLeave ?? { allocated: 0, remaining: 0 };
+  const casualLeave = leaveBalance?.casual ?? { allocated: 0, remaining: 0 };
+  const sickLeave = leaveBalance?.sick ?? { allocated: 0, remaining: 0 };
 
   return (
     <div className="space-y-6">

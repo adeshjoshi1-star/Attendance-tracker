@@ -90,9 +90,14 @@ export default function MyLeaves() {
     {
       key: 'days',
       label: 'Days',
-      render: (val) => (
-        <span className="font-medium text-slate-700 dark:text-slate-300">{val ?? '-'}</span>
-      ),
+      render: (_, row) => {
+        if (row.days) return <span className="font-medium text-slate-700 dark:text-slate-300">{row.days}</span>;
+        if (row.start_date && row.end_date) {
+          const d = Math.floor((new Date(row.end_date) - new Date(row.start_date)) / (1000 * 60 * 60 * 24)) + 1;
+          return <span className="font-medium text-slate-700 dark:text-slate-300">{d}</span>;
+        }
+        return <span className="text-slate-400">-</span>;
+      },
     },
     {
       key: 'reason',
@@ -117,8 +122,8 @@ export default function MyLeaves() {
     },
   ];
 
-  const casualLeave = leaveBalance?.casual_leave ?? leaveBalance?.casualLeave ?? {};
-  const sickLeave = leaveBalance?.sick_leave ?? leaveBalance?.sickLeave ?? {};
+  const casualLeave = leaveBalance?.casual ?? {};
+  const sickLeave = leaveBalance?.sick ?? {};
 
   const renderLeaveRequests = () => (
     <div className="space-y-4">

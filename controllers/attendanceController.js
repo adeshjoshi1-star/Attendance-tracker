@@ -2,9 +2,9 @@ const { pool } = require('../config/db');
 
 const markAttendance = async (req, res, next) => {
   try {
-    const { attendance_status, remarks } = req.body;
+    const { attendance_status, remarks, attendance_date } = req.body;
     const employeeId = req.user.id;
-    const today = new Date().toISOString().split('T')[0];
+    const date = attendance_date || new Date().toISOString().split('T')[0];
 
     if (!attendance_status) {
       return res.status(400).json({ success: false, message: 'Attendance status is required' });
@@ -17,11 +17,11 @@ const markAttendance = async (req, res, next) => {
 
     const [existing] = await pool.query(
       'SELECT id FROM attendance WHERE employee_id = ? AND attendance_date = ?',
-      [employeeId, today]
+      [employeeId, date]
     );
 
     if (existing.length > 0) {
-      return res.status(409).json({ success: false, message: 'Attendance already marked for today' });
+      return res.status(409).json({ success: false, message: 'Attendance already marked for this date' });
     }
 
     const connection = await pool.getConnection();
@@ -30,7 +30,7 @@ const markAttendance = async (req, res, next) => {
 
       await connection.query(
         'INSERT INTO attendance (employee_id, attendance_date, attendance_status, remarks) VALUES (?, ?, ?, ?)',
-        [employeeId, today, attendance_status, remarks || null]
+        [employeeId, date, attendance_status, remarks || null]
       );
 
       if (attendance_status === 'Casual Leave' || attendance_status === 'Sick Leave') {
