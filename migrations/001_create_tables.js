@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const { pool } = require('../config/db');
 
 const createTablesSQL = `
@@ -102,6 +103,16 @@ async function run() {
       console.error('Migration error:', error.message);
       throw error;
     }
+  }
+
+  const [existing] = await pool.query("SELECT id FROM users WHERE email = ?", ['admin@company.com']);
+  if (existing.length === 0) {
+    const hash = await bcrypt.hash('admin123', 10);
+    await pool.query(
+      'INSERT INTO users (employee_id, name, email, phone, department, role, password_hash, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      ['ADMIN001', 'Admin', 'admin@company.com', '1234567890', 'Operations', 'admin', hash, 'active']
+    );
+    console.log('Default admin user created (admin@company.com / admin123)');
   }
 }
 
