@@ -184,7 +184,10 @@ const departmentReport = async (req, res, next) => {
       }
     }
 
-    const reportData = Object.values(deptMap);
+    const reportData = Object.values(deptMap).map((d) => ({
+      ...d,
+      attendance_percentage: d.total > 0 ? Math.round(((d.present + d.wfh) / d.total) * 100) : 0,
+    }));
 
     if (exportFormat) {
       const filename = `department_report_${startDate}_to_${endDate}.${exportFormat}`;
@@ -269,7 +272,7 @@ const exportReport = async (req, res, next) => {
         const d = deptMap[row.department]; d.total += row.count;
         switch (row.attendance_status) { case 'Present': d.present = row.count; break; case 'Absent': d.absent = row.count; break; case 'Half Day': d.half_day = row.count; break; case 'Work From Home': d.wfh = row.count; break; case 'Casual Leave': d.cl = row.count; break; case 'Sick Leave': d.sl = row.count; break; }
       }
-      data = Object.values(deptMap);
+      data = Object.values(deptMap).map((d) => ({ ...d, attendance_percentage: d.total > 0 ? Math.round(((d.present + d.wfh) / d.total) * 100) : 0 }));
       filename = `department_report_${startDate}_to_${endDate}.${exportFormat}`;
     }
 
