@@ -15,6 +15,25 @@ const markAttendance = async (req, res, next) => {
       return res.status(400).json({ success: false, message: 'Invalid attendance status' });
     }
 
+    if (attendance_status === 'Casual Leave' || attendance_status === 'Sick Leave') {
+      const [existing] = await pool.query(
+        `SELECT lr.id FROM leave_requests lr
+         WHERE lr.employee_id = ? AND lr.start_date = ? AND lr.status = 'pending'`,
+        [employeeId, date]
+      );
+      if (existing.length > 0) {
+        return res.status(409).json({ success: false, message: 'A leave request for this date is already pending' });
+      }
+
+      await pool.query(
+        `INSERT INTO leave_requests (employee_id, leave_type, start_date, end_date, reason)
+         VALUES (?, ?, ?, ?, ?)`,
+        [employeeId, attendance_status, date, date, remarks || 'Marked via attendance']
+      );
+
+      return res.status(201).json({ success: true, message: 'Leave request submitted for approval' });
+    }
+
     const [existing] = await pool.query(
       'SELECT id FROM attendance WHERE employee_id = ? AND attendance_date = ?',
       [employeeId, date]
@@ -24,32 +43,12 @@ const markAttendance = async (req, res, next) => {
       return res.status(409).json({ success: false, message: 'Attendance already marked for this date' });
     }
 
-    const connection = await pool.getConnection();
-    try {
-      await connection.beginTransaction();
+    await pool.query(
+      'INSERT INTO attendance (employee_id, attendance_date, attendance_status, remarks) VALUES (?, ?, ?, ?)',
+      [employeeId, date, attendance_status, remarks || null]
+    );
 
-      await connection.query(
-        'INSERT INTO attendance (employee_id, attendance_date, attendance_status, remarks) VALUES (?, ?, ?, ?)',
-        [employeeId, date, attendance_status, remarks || null]
-      );
-
-      if (attendance_status === 'Casual Leave' || attendance_status === 'Sick Leave') {
-        const col = attendance_status === 'Casual Leave' ? 'casual_used' : 'sick_used';
-        await connection.query(
-          `UPDATE leave_balances SET ${col} = ${col} + 1 WHERE employee_id = ?`,
-          [employeeId]
-        );
-      }
-
-      await connection.commit();
-      connection.release();
-
-      res.status(201).json({ success: true, message: 'Attendance marked successfully' });
-    } catch (err) {
-      await connection.rollback().catch(() => {});
-      connection.release();
-      throw err;
-    }
+    res.status(201).json({ success: true, message: 'Attendance marked successfully' });
   } catch (error) {
     next(error);
   }
@@ -145,13 +144,7 @@ const getMonthlyStats = async (req, res, next) => {
       }
     }
 
-    const daysInMonth = new Date(year, month, 0).getDate();
-    let workingDays = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dayOfWeek = new Date(year, month - 1, d).getDay();
-      if (dayOfWeek !== 0 && dayOfWeek !== 6) workingDays++;
-    }
-    stats.percentage = workingDays > 0 ? Math.round(((stats.present + stats.wfh) / workingDays) * 100) : 0;
+    stats.percentage = stats.total > 0 ? Math.round(((stats.present + stats.wfh) / stats.total) * 100) : 0;
 
     res.json({ success: true, data: stats, month, year });
   } catch (error) {

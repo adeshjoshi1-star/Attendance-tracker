@@ -126,16 +126,9 @@ const monthlyReport = async (req, res, next) => {
       }
     }
 
-    const daysInMonth = new Date(year, month, 0).getDate();
-    let workingDays = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dow = new Date(year, month - 1, d).getDay();
-      if (dow !== 0 && dow !== 6) workingDays++;
-    }
-
     const reportData = Object.values(employeeMap).map((e) => ({
       ...e,
-      attendance_percentage: workingDays > 0 ? Math.round(((e.present + e.wfh) / workingDays) * 100) : 0,
+      attendance_percentage: e.total > 0 ? Math.round(((e.present + e.wfh) / e.total) * 100) : 0,
     }));
 
     if (exportFormat) {
@@ -257,11 +250,7 @@ const exportReport = async (req, res, next) => {
         switch (rec.attendance_status) { case 'Present': e.present++; break; case 'Absent': e.absent++; break; case 'Half Day': e.half_day++; break; case 'Work From Home': e.wfh++; break; case 'Casual Leave': e.cl++; break; case 'Sick Leave': e.sl++; break; }
       }
 
-      const daysInMonth = new Date(y, m, 0).getDate();
-      let workingDays = 0;
-      for (let d = 1; d <= daysInMonth; d++) { const dow = new Date(y, m - 1, d).getDay(); if (dow !== 0 && dow !== 6) workingDays++; }
-
-      data = Object.values(empMap).map((e) => ({ ...e, attendance_percentage: workingDays > 0 ? Math.round(((e.present + e.wfh) / workingDays) * 100) : 0 }));
+      data = Object.values(empMap).map((e) => ({ ...e, attendance_percentage: e.total > 0 ? Math.round(((e.present + e.wfh) / e.total) * 100) : 0 }));
       filename = `monthly_report_${y}_${m}.${exportFormat}`;
     } else if (type === 'department') {
       if (!startDate || !endDate) {

@@ -228,6 +228,22 @@ const approveLeave = async (req, res, next) => {
       [days, leaveReq.employee_id]
     );
 
+    for (let d = 0; d < days; d++) {
+      const current = new Date(start);
+      current.setDate(current.getDate() + d);
+      const dateStr = current.toISOString().split('T')[0];
+      const [existing] = await connection.query(
+        'SELECT id FROM attendance WHERE employee_id = ? AND attendance_date = ?',
+        [leaveReq.employee_id, dateStr]
+      );
+      if (existing.length === 0) {
+        await connection.query(
+          'INSERT INTO attendance (employee_id, attendance_date, attendance_status) VALUES (?, ?, ?)',
+          [leaveReq.employee_id, dateStr, leaveReq.leave_type]
+        );
+      }
+    }
+
     await connection.query(
       `INSERT INTO notifications (notification_type, title, message, related_id)
        VALUES ('leave', ?, ?, ?)`,
