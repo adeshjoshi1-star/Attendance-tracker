@@ -89,12 +89,12 @@ export default function LeaveManagement() {
     {
       key: 'employee',
       label: 'Employee',
-      render: (_, row) => row.employee?.name || row.employee_name || 'N/A',
+      render: (_, row) => row.name || row.employee_name || 'N/A',
     },
     {
       key: 'leave_type',
       label: 'Leave Type',
-      render: (val) => <StatusBadge status={val || row.type} />,
+      render: (val, row) => <StatusBadge status={val || row.type} />,
     },
     {
       key: 'dates',
@@ -144,7 +144,7 @@ export default function LeaveManagement() {
     {
       key: 'employee',
       label: 'Employee',
-      render: (_, row) => row.employee?.name || row.employee_name || 'N/A',
+      render: (_, row) => row.name || row.employee_name || 'N/A',
     },
     {
       key: 'leave_type',
